@@ -1,11 +1,12 @@
 <?php
 class User {
+  public $id;
   public $name;
   public $lastname;
   public $username;
   public $email;
   public $password;
-  public $active = false;
+  private $loggedIn = false;
 
   public function __construct($_username, $_email, $_password) {
     $this->username = $_username;
@@ -16,22 +17,54 @@ class User {
   public function getFullName() {
     return $this->name. " " .$this->lastname;
   }
+
+  public function logIn() {
+    $this->loggedIn = true;
+  }
+
+  public function logOut() {
+    $this->loggedIn = false;
+  }
+
+  public function isLoggedIn() {
+    return $this->loggedIn;
+  }
+
+
+}
+
+class Administrator extends User {
+
+  protected function createNewPost($postName) {
+    echo "L'amministratore $this->username ha creato il post: $postName";
+  }
+
+  protected function banUser($user) {
+    echo "L'amministratore $this->username ha bannato l'utente $user->username";
+  }
 }
 
 $andrea = new User("Seven897", "andreacontest@gmail.com", "password12345");
-$andrea->active = true;
+$andrea->logIn(); 
 
 $mario = new User("Teemo123", "mario.rossi@gmail.com", "yasuo12345");
 
 $silvia = new User("Silver91", "silvia.rossetti@yahoo.com", "parolasegreta765");
 $silvia->name = "Silvia";
 $silvia->lastname = "Rossetti";
-$silvia->active = true;
+$silvia->logIn();
 
 $lucia = new User("Lux77", "lucia.bertini@libero.it", "demacia404");
-$lucia->active = true;
+$lucia->logIn();
 
 $users = [$andrea, $mario, $silvia, $lucia];
+
+$luca = new Administrator("SuperAdmin9000", "superadmin9000@gmail.com", "getbanned666");
+
+$carlo = new Administrator("JudgeAndJury89", "carlo.giudici@gmail.com", "dredd1989");
+$carlo->logIn();
+
+$admins = [$luca, $carlo];
 
 ?>
 
@@ -47,7 +80,8 @@ $users = [$andrea, $mario, $silvia, $lucia];
 </head>
 <body>
   <div class="container">
-    <h1>Database Segreto</h1>
+    <h1>Lista Utenti</h1>
+    <h2>Utenti</h2>
     <table>
       <thead>
         <tr>
@@ -55,7 +89,7 @@ $users = [$andrea, $mario, $silvia, $lucia];
           <th class="table-heading">Username</th>
           <th class="table-heading">Email</th>
           <th class="table-heading">Password</th>
-          <th class="table-heading">Active User</th>
+          <th class="table-heading">Online</th>
         </tr>
       </thead>
       <tbody>
@@ -65,7 +99,34 @@ $users = [$andrea, $mario, $silvia, $lucia];
               <td><?php echo $user->username ?></td>
               <td><?php echo $user->email ?></td>
               <td><?php echo $user->password ?></td>
-              <?php if($user->active == true): ?>
+              <?php if($user->isLoggedIn() == true): ?>
+                <td class="green">
+                  <i class="fas fa-check"></i>
+                </td>
+              <?php else: ?>
+                <td class="red">
+                  <i class="fas fa-times"></i>
+                </td>
+              <?php endif ?>
+          </tr>
+        <?php endforeach ?>
+      </tbody>
+    </table>
+    <h2>Amministratori</h2>
+    <table>
+      <thead>
+        <tr>
+          <th class="table-heading">Username</th>
+          <th class="table-heading">Email</th>
+          <th class="table-heading">Online</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach($admins as $admin): ?>
+          <tr>
+              <td><?php echo $admin->username ?></td>
+              <td><?php echo $admin->email ?></td>
+              <?php if($admin->isLoggedIn() == true): ?>
                 <td class="green">
                   <i class="fas fa-check"></i>
                 </td>
